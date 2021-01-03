@@ -1,3 +1,3 @@
 # ExcelPathfinding
 
-Hello
+[logo]: ./preview.gif
