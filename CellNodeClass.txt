@@ -1,0 +1,48 @@
+Option Explicit
+
+Private g_cost As Integer
+Private h_cost As Integer
+Private f_cost As Integer
+Private vCell As Range
+Private vParent As CellNode
+
+Public Property Get Parent() As CellNode
+    Set Parent = vParent
+End Property
+
+Public Property Set Parent(value As CellNode)
+    Set vParent = value
+    g_cost = value.GCost + 1
+End Property
+
+Public Property Get GCost() As Integer
+    GCost = g_cost
+End Property
+
+Public Property Get HCost() As Integer
+    HCost = h_cost
+End Property
+
+Public Property Get FCost() As Integer
+    FCost = g_cost + h_cost
+End Property
+
+Public Property Get Cell() As Range
+    Set Cell = vCell
+End Property
+
+Public Property Set Cell(value As Range)
+    Set vCell = value
+    h_cost = Math.Abs(vCell.Row - ActiveSheet.Range("K11").Row) + Math.Abs(vCell.Column - ActiveSheet.Range("K11").Column)
+End Property
+
+Public Property Get IsValid() As Boolean
+    If Me.Cell.Row >= 2 And _
+        Me.Cell.Column >= 2 And _
+        Not Me.Cell.Address = STARTING_CELL_ADDRESS And _
+        Not Me.Cell.Interior.Color = 0 Then
+        IsValid = True
+    Else
+        IsValid = False
+    End If
+End Property
