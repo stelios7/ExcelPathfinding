@@ -38,35 +38,29 @@ Sub SolvePuzzle()
     Dim closestNode As CellNode, vNode As CellNode
     Dim successor As CellNode, successorList As Collection
     Dim nodeCost As Integer, nHCost As Integer, closestNodeCost As Integer
+    Dim success As Boolean
     
     Do While openList.Count > 0
         Dim key As Variant
+        
         For Each key In openList.keys
             Set closestNode = openList(key)
-'            Exit For
         Next
-        For Each key In openList.keys
         
+        For Each key In openList.keys
             nodeCost = openList(key).FCost
-            nHCost = openList(key).HCost
             closestNodeCost = closestNode.FCost
-            'Debug.Print key, openList(key).GCost, nodeCost, closestNodeCost
             If nodeCost < closestNodeCost Then
                 Set closestNode = openList(key)
                 Exit For
             End If
-            
-
-'            If nHCost < closestNode.HCost Then
-'                Set closestNode = openList(key)
-'            End If
-            
         Next
-        openList.Remove closestNode.Cell.Address
         
+        openList.Remove closestNode.Cell.Address
         
         Dim bCell As Range, rCell As Range, tCell As Range, lCell As Range
         Set successorList = New Collection
+        
         'CHECK BOTTOM CELL
         Set bCell = closestNode.Cell.Offset(1, 0)
         Set successor = New CellNode
@@ -74,21 +68,16 @@ Sub SolvePuzzle()
         Set successor.Parent = closestNode
         If successor.IsValid And Not closedList.exists(successor.Cell.Address) Then
             successorList.Add successor
-'            Debug.Print vbTab & successor.Cell.Address & " added to the list"
         End If
-'        Helper.DebugNode successor
         
         'CHECK RIGHT CELL
         Set rCell = closestNode.Cell.Offset(0, 1)
         Set successor = New CellNode
         Set successor.Cell = rCell
         Set successor.Parent = closestNode
-'        Debug.Print successor.Parent Is Nothing
         If successor.IsValid And Not closedList.exists(successor.Cell.Address) Then
             successorList.Add successor
-'            Debug.Print vbTab & successor.Cell.Address & " added to the list"
         End If
-'        Helper.DebugNode successor
         
         'CHECK TOP CELL
         Set tCell = closestNode.Cell.Offset(-1, 0)
@@ -97,7 +86,6 @@ Sub SolvePuzzle()
         Set successor.Parent = closestNode
         If successor.IsValid And Not closedList.exists(successor.Cell.Address) Then
             successorList.Add successor
-'            Debug.Print vbTab & successor.Cell.Address & " added to the list"
         End If
         
         'CHECK LEFT CELL
@@ -107,46 +95,47 @@ Sub SolvePuzzle()
         Set successor.Parent = closestNode
         If successor.IsValid And Not closedList.exists(successor.Cell.Address) Then
             successorList.Add successor
-'            Debug.Print vbTab & successor.Cell.Address & " added to the list"
         End If
         
         Dim v As CellNode
         For Each v In successorList
-'            Set nodes(v.Cell.Address).Parent = v.Parent
-            If v.Cell.Address = finishCell.Address Then
-                Debug.Print "Stop Search"
-                TraceBackFrom v
-                Exit Do
-            End If
-                
             Dim currentAddress As String
             currentAddress = v.Cell.Address
             
+            If v.Cell.Address = finishCell.Address Then
+                Debug.Print "Stop Search"
+                success = True
+                TraceBackFrom v
+                Exit Do
+            End If
+            
             If openList.exists(currentAddress) Then
-'                If v.FCost < openList(currentaddress).FCost Then
-'                    Set nodes(currentaddress) = v
-'                End If
                 If v.HCost < openList(currentAddress).HCost Then
                     Set nodes(currentAddress) = v
                 End If
             End If
-            
 
             If Not closedList.exists(currentAddress) Then
-                If openList.exists(currentAddress) Then
-'                    Helper.DebugNode v
-'                    Helper.DebugNode openList(currentAddress)
-                Else
+                If Not openList.exists(currentAddress) Then
                     openList.Add v.Cell.Address, v
-'                    v.Cell.Interior.Color = customColor
-                    v.Cell.Interior.Color = RGB(Rnd() * 10 + 10, Rnd() * 25 + 135, Rnd() * 25 + 220)
+                    v.Cell.Interior.Color = RGB(Rnd() * 30 + 70, Rnd() * 15 + 240, Rnd() * 30 + 150)
                 End If
-                
-'                Sleep 1
             End If
         Next
+        
         closedList.Add closestNode.Cell.Address, closestNode
+        closestNode.Cell.Interior.Color = RGB(0, 100, Rnd() * 20 + 200)
     Loop
+    
+    If Not success Then
+        Set vNode = New CellNode
+        Application.ScreenUpdating = False
+        For Each key In closedList.keys
+            closedList(key).Cell.Interior.Color = RGB(Rnd() * 100 + 15, 0, 0)
+        Next
+        Application.ScreenUpdating = True
+    End If
+    
 End Sub
 
 Private Sub TraceBackFrom(vNode As CellNode)
@@ -158,10 +147,10 @@ Private Sub TraceBackFrom(vNode As CellNode)
     
     Dim i As Integer
     Dim customColor As Variant
-    customColor = RGB(Rnd() * 255, Rnd() * 255, Rnd() * 255)
+    customColor = RGB(255, Rnd() * 20 + 50, Rnd() * 20 + 200)
     For i = 1 To path.Count
         path(i).Interior.Color = customColor
-        Sleep 10
+        Sleep 20
     Next
     
     Debug.Print "Steps: " & path.Count
