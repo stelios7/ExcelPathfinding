@@ -1,3 +1,12 @@
+VERSION 1.0 CLASS
+BEGIN
+  MultiUse = -1  'True
+END
+Attribute VB_Name = "CellNode"
+Attribute VB_GlobalNameSpace = False
+Attribute VB_Creatable = False
+Attribute VB_PredeclaredId = False
+Attribute VB_Exposed = False
 Option Explicit
 
 Private g_cost As Integer
@@ -33,7 +42,15 @@ End Property
 
 Public Property Set Cell(value As Range)
     Set vCell = value
-    h_cost = Math.Abs(vCell.Row - ActiveSheet.Range("K11").Row) + Math.Abs(vCell.Column - ActiveSheet.Range("K11").Column)
+    
+    'THESE ARE THE ROW AND COL OF THE TARGET CELL
+    Dim i As Integer, j As Integer
+    i = Range(STARTING_CELL_ADDRESS).Row + PUZZLE_SIZE - 1
+    j = Range(STARTING_CELL_ADDRESS).Column + PUZZLE_SIZE - 1
+    
+    h_cost = vCell.Row - i + vCell.Column - j
+    h_cost = Math.Abs(h_cost)
+    
 End Property
 
 Public Property Get IsValid() As Boolean
@@ -46,3 +63,5 @@ Public Property Get IsValid() As Boolean
         IsValid = False
     End If
 End Property
+
+

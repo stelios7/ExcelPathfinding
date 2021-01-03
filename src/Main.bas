@@ -1,3 +1,7 @@
+Attribute VB_Name = "Main"
+Option Explicit
+
+Public Declare PtrSafe Sub Sleep Lib "kernel32" (ByVal Milliseconds As LongPtr)
 Sub SolvePuzzle()
     'TO DO
     Dim customColor As Variant
@@ -33,25 +37,29 @@ Sub SolvePuzzle()
     openList.Add STARTING_CELL_ADDRESS, nodes(STARTING_CELL_ADDRESS)
     Dim closestNode As CellNode, vNode As CellNode
     Dim successor As CellNode, successorList As Collection
-    Dim nodeCost As Integer, nHCost As Integer
+    Dim nodeCost As Integer, nHCost As Integer, closestNodeCost As Integer
     
     Do While openList.Count > 0
         Dim key As Variant
         For Each key In openList.keys
             Set closestNode = openList(key)
-            Exit For
+'            Exit For
         Next
         For Each key In openList.keys
         
-'            nodeCost = openList(key).FCost
-'            If nodeCost < closestNode.FCost Then
+            nodeCost = openList(key).FCost
+            nHCost = openList(key).HCost
+            closestNodeCost = closestNode.FCost
+            'Debug.Print key, openList(key).GCost, nodeCost, closestNodeCost
+            If nodeCost < closestNodeCost Then
+                Set closestNode = openList(key)
+                Exit For
+            End If
+            
+
+'            If nHCost < closestNode.HCost Then
 '                Set closestNode = openList(key)
 '            End If
-            
-            nHCost = openList(key).HCost
-            If nHCost < closestNode.HCost Then
-                Set closestNode = openList(key)
-            End If
             
         Next
         openList.Remove closestNode.Cell.Address
@@ -111,21 +119,29 @@ Sub SolvePuzzle()
                 Exit Do
             End If
                 
-            If openList.exists(v.Cell.Address) Then
-                If v.FCost < openList(v.Cell.Address).FCost Then
-                    Set nodes(v.Cell.Address) = v
+            Dim currentAddress As String
+            currentAddress = v.Cell.Address
+            
+            If openList.exists(currentAddress) Then
+'                If v.FCost < openList(currentaddress).FCost Then
+'                    Set nodes(currentaddress) = v
+'                End If
+                If v.HCost < openList(currentAddress).HCost Then
+                    Set nodes(currentAddress) = v
                 End If
             End If
             
-            Dim currentAddress As String
-            currentAddress = v.Cell.Address
+
             If Not closedList.exists(currentAddress) Then
                 If openList.exists(currentAddress) Then
-                
+'                    Helper.DebugNode v
+'                    Helper.DebugNode openList(currentAddress)
                 Else
                     openList.Add v.Cell.Address, v
+'                    v.Cell.Interior.Color = customColor
+                    v.Cell.Interior.Color = RGB(Rnd() * 10 + 10, Rnd() * 25 + 135, Rnd() * 25 + 220)
                 End If
-                v.Cell.Interior.Color = customColor
+                
 '                Sleep 1
             End If
         Next
@@ -152,6 +168,7 @@ Private Sub TraceBackFrom(vNode As CellNode)
 End Sub
 
 Sub GeneratePuzzle()
+    Application.ScreenUpdating = False
     Dim startingCell As Range
     Set startingCell = ActiveSheet.Range("B2")
     
@@ -176,11 +193,13 @@ Sub GeneratePuzzle()
     For Each vCell In puzzleField
         If Not vCell.Address = STARTING_CELL_ADDRESS And Not vCell.Address = finishCell.Address Then
             rng = Rnd()
-            If rng > 0.7 Then
+            If rng > 0.65 Then
 '                Sleep 1
                 vCell.Interior.Color = vbBlack
             End If
         End If
         
     Next
+    Application.ScreenUpdating = True
 End Sub
+
