@@ -2,4 +2,4 @@
 
 ![alt text][logo]
 
-[logo]: https://i.imgur.com/K2TIG1s.gif "Preview"
+[logo]: httpsL//github.com/stelios7/excelpathfinding/preview.gif "Preview"
